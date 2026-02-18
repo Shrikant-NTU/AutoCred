@@ -1,0 +1,88 @@
+indicator_prompt = f"""
+You are helping define evaluation criteria for a simulation credibility assessment for a specific simulation model.
+
+You are given:
+
+1) SIMULATION DESCRIPTION:
+{simulation_description}
+
+2) CONCEPTUAL MODEL for this simulation (objectives, entities, state variables, mechanisms, assumptions, expected behaviours):
+{json.dumps(conceptual_model, indent=2)}
+
+
+
+Your task is to propose EXACTLY 4 indicators that will be used to score
+INDIVIDUAL RUNS of THIS simulation model.
+
+Requirements for the indicators:
+- EACH indicator must correspond to an important aspect of credibility GIVEN the conceptual model above.
+- At least some indicators should clearly relate to the expected behaviours and/or the numeric rules (for example, penalizing runs that violate basic assumptions such as non-negativity or simple predator–prey logic).
+- Indicators must be reusable across different runs of the same model (do NOT refer to specific run IDs or one-off anomalies).
+- Indicators should collectively cover different, non-overlapping aspects of credibility (do not define four nearly-identical indicators).
+
+For EACH indicator, provide:
+- "name": a short string name
+- "description": one sentence describing what it measures and how it relates to the conceptual model (expectations, mechanisms, or rules)
+- "weight": a float between 0.0 and 1.0 indicating importance
+
+IMPORTANT about weights:
+- Use the conceptual model to decide which aspects of credibility are MOST critical for this model.
+- If violating a basic assumption or rule would seriously undermine the model, the corresponding indicator(s) should have a relatively HIGHER weight.
+- Less critical aspects (nice-to-have, secondary behaviours) should have LOWER weights.
+- All weights MUST sum to 1.0 (within a small numerical tolerance).
+- Do NOT make all weights equal unless you genuinely judge all aspects to be equally important for THIS specific model.
+
+Output JSON ONLY, with this structure:
+
+{{
+  "indicators": [
+    {{
+      "name": "...",
+      "description": "...",
+      "weight": 0.0
+    }},
+    {{
+      "name": "...",
+      "description": "...",
+      "weight": 0.0
+    }},
+    {{
+      "name": "...",
+      "description": "...",
+      "weight": 0.0
+    }},
+    {{
+      "name": "...",
+      "description": "...",
+      "weight": 0.0
+    }}
+  ]
+}}
+
+Do not add any extra keys or text outside the JSON.
+"""
+
+indicator_messages = [
+    {
+        "role": "system",
+        "content": "You are an expert modeler defining transparent, reusable indicators for simulation credibility."
+    },
+    {
+        "role": "user",
+        "content": "SIMULATION DESCRIPTION:\n" + simulation_description
+    },
+    
+    {
+        "role": "user",
+        "content": indicator_prompt
+    }
+]
+
+
+
+
+indicators_response = client.chat.completions.create(
+    model="gpt-5.1",
+    messages=indicator_messages,
+    max_completion_tokens=600,
+)

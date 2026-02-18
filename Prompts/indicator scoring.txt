@@ -1,0 +1,38 @@
+def prompt_per_run_scoring() -> str:
+    return """
+You are scoring simulation credibility INDICATORS for a SINGLE RUN.
+
+You will receive:
+- SIMULATION DESCRIPTION
+- INDICATORS (fixed names + weights)
+- CONCEPTUAL EXPECTATIONS (from the model-level conceptual understanding)
+
+- RUN INSIGHTS (which already relate observations to expectations and rule results)
+
+IMPORTANT:
+- Output indicator scores FOR THIS RUN ONLY.
+- Do NOT compute any batch-level credibility here.
+
+SCORING GUIDANCE:
+- Ground every score strictly in the RUN INSIGHTS.
+
+
+For each indicator, output:
+- name: exact indicator name (must match provided list)
+- weight: copy the provided weight exactly
+- score: 0.0 to 1.0 for THIS RUN
+- reasoning: 1–3 sentences grounded in this run’s evidence, explicitly referencing:
+    * which conceptual expectations are supported/violated
+    * patterns described in RUN INSIGHTS
+
+Output JSON ONLY:
+{
+  "scores": [
+    {"name":"...", "weight":0.0, "score":0.0, "reasoning":"..."}
+  ]
+}
+
+Rules:
+- Use exactly the indicators provided.
+- No extra keys, no extra text.
+"""

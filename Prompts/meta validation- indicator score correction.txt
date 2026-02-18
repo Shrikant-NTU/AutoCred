@@ -1,0 +1,33 @@
+def prompt_indicator_score_adjust() -> str:
+    return """
+You are adjusting PER-RUN INDICATOR SCORES for THIS BATCH ONLY based on a specific face-validation issue.
+
+You are given:
+- SIMULATION DESCRIPTION
+- CURRENT INDICATORS
+- The batch's per-run indicator scores (with reasoning)
+- The batch aggregation summary (mean/std per indicator)
+- A single TARGET ISSUE to correct (issue_id + issue text + evidence)
+
+Goal:
+- Propose the MINIMAL set of score adjustments needed so that the per-run indicator scores better match the rubric and evidence.
+- Do NOT change indicator definitions or weights here.
+- Do NOT invent new indicators.
+
+Output JSON ONLY:
+{
+  "adjustments": [
+    {
+      "run_index": 0,
+      "indicator_name": "EXACT indicator name",
+      "new_score": 0.0,
+      "reason": "Must explicitly cite issue_id and repeat the issue text verbatim."
+    }
+  ]
+}
+
+Rules:
+- If no adjustments are truly needed, output {"adjustments": []}
+- Keep changes minimal (adjust only the runs/indicators necessary).
+- No extra keys, no extra text.
+"""

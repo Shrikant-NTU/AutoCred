@@ -1,0 +1,78 @@
+def prompt_face_validation() -> str:
+    return """
+You are reviewing a batch of simulation credibility assessments as an experienced human modeler.
+
+IMPORTANT: Your job is to CHECK CALIBRATION, not to invent improvements.
+- Prefer rubric stability. Do NOT propose changes unless there is clear evidence of miscalibration in THIS BATCH.
+- Do NOT "raise the bar" simply because you can.
+- Only recommend changes when you can point to specific runs/indicators where the current rubric produces an obviously incorrect or inconsistent result relative to the SIMULATION DESCRIPTION and the provided evidence.
+
+You are given, for THIS BATCH ONLY:
+- SIMULATION DESCRIPTION
+- CURRENT INDICATORS (names, descriptions, weights)
+- Per-run indicator scores (0–1) with reasoning
+- One batch-level credibility score (computed deterministically from the set of runs)
+- Aggregator description and across-run indicator summary
+
+You MUST output the following JSON ONLY:
+
+{
+  "short_summary": "Exactly 2 sentences summarising whether a change is warranted and the biggest issue (if any).",
+  "issues_found": [
+    {
+      "issue_id": "ISSUE-1",
+      "issue": "...",
+      "evidence": "... (must cite across-run or specific run evidence)",
+      "severity": "low|medium|high"
+    }
+  ],
+  "recommend_change": true/false,
+  "recommended_changes": [
+    {
+      "type": "indicator score adjust|weight_adjust|indicator_change",
+      "issue_id": "ISSUE-1",
+      "details": "Describe the minimal change needed and what it fixes."
+    }
+  ]
+}
+
+Hard rules:
+- If no problems: set recommend_change=false, issues_found=[], recommended_changes=[]
+- Every recommended_changes item MUST reference an existing issue_id from issues_found.
+- No extra keys, no extra text.
+"""
+
+
+def prompt_indicator_score_adjust() -> str:
+    return """
+You are adjusting PER-RUN INDICATOR SCORES for THIS BATCH ONLY based on a specific face-validation issue.
+
+You are given:
+- SIMULATION DESCRIPTION
+- CURRENT INDICATORS
+- The batch's per-run indicator scores (with reasoning)
+- The batch aggregation summary (mean/std per indicator)
+- A single TARGET ISSUE to correct (issue_id + issue text + evidence)
+
+Goal:
+- Propose the MINIMAL set of score adjustments needed so that the per-run indicator scores better match the rubric and evidence.
+- Do NOT change indicator definitions or weights here.
+- Do NOT invent new indicators.
+
+Output JSON ONLY:
+{
+  "adjustments": [
+    {
+      "run_index": 0,
+      "indicator_name": "EXACT indicator name",
+      "new_score": 0.0,
+      "reason": "Must explicitly cite issue_id and repeat the issue text verbatim."
+    }
+  ]
+}
+
+Rules:
+- If no adjustments are truly needed, output {"adjustments": []}
+- Keep changes minimal (adjust only the runs/indicators necessary).
+- No extra keys, no extra text.
+"""

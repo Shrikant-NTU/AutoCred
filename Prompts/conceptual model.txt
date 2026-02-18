@@ -1,0 +1,140 @@
+prompt = f"""
+You are an expert in simulation conceptual modeling.
+
+You are given:
+1) A high-level SIMULATION DESCRIPTION (problem / model description).
+2) A list of DATA COLUMNS from NetLogo/BehaviorSpace time-series output.
+3) A list of PARAMETER NAMES used in the experiment.
+
+Your task:
+Construct a CONCEPTUAL MODEL for this simulation that is:
+- NON-SOFTWARE-SPECIFIC.
+- Concise but precise.
+- Suitable as a bridge between the problem description and the computer model.
+
+Follow this JSON SCHEMA EXACTLY:
+
+{{
+  "objectives": ["..."],
+
+  "entities": [
+    {{
+      "name": "sheep",
+      "role": "agent|population|resource|environment|other",
+      "state_variables": ["energy", "..."],
+      "columns": ["sheep"]
+    }}
+  ],
+
+  "state_variables": [
+    {{
+      "name": "sheep",
+      "kind": "population|resource|rate|other",
+      "column": "sheep"
+    }}
+  ],
+
+  "parameters": [
+    {{
+      "name": "sheep-reproduce",
+      "role": "initial_condition|rate|policy|other"
+    }}
+  ],
+
+  "mechanisms": [
+    "Plain-language description of key processes and interactions."
+  ],
+
+  "assumptions": [
+    "Simplifying assumptions or uncertainties in how the world is represented."
+  ],
+
+  "exclusions": [
+    "Important aspects that are purposely NOT modeled (e.g., disease, space heterogeneity)."
+  ],
+
+  "expected_behaviours": [
+    "Qualitative expectations about trajectories (e.g., wolves decline if sheep are scarce)."
+  ]
+}}
+
+Hard rules:
+- Use ONLY JSON, no extra commentary.
+- Every key in the schema MUST be present.
+- For 'columns' and 'column', only use names from this list:
+  {data_columns}
+- For 'parameters', only use names from this list:
+  {param_names}
+- If something is not directly observable in the data, set "column": null.
+- Keep descriptions short and technical.
+- The JSON MUST be valid and parseable with json.loads.
+"""
+
+    response = client.chat.completions.create(
+        model="gpt-5.1",
+        messages=[{"role": "user", "content": prompt}],
+        
+    )
+    raw = response.choices[0].message.content
+    try:
+        cm = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(
+            f"LLM did not return valid JSON for conceptual model. Error: {e}\nRaw:\n{raw}"
+        )
+
+    # Ensure expected_behaviours field exists
+    if "expected_behaviours" not in cm:
+        cm["expected_behaviours"] = []
+
+    return cm
+
+
+def score_conceptual_model(conceptual_model: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Take a conceptual_model and return a conceptual validity evaluation.
+
+    Returns:
+    {
+      "validity_score": float in [0,1],
+      "strengths": [...],
+      "weaknesses": [...],
+      "alignment_issues": [...],
+      "reasoning": "short paragraph"
+    }
+    """
+    cm_text = json.dumps(conceptual_model, indent=2)
+    prompt = f"""
+You are reviewing a simulation CONCEPTUAL MODEL.
+
+CONCEPTUAL MODEL (JSON):
+{cm_text}
+
+Task:
+Evaluate the conceptual model along three dimensions:
+1) Clarity & completeness (objectives, entities, state variables, mechanisms, assumptions).
+2) Internal coherence (no obvious contradictions; mechanisms support objectives).
+3) Implementation alignment (the conceptual entities and state variables are reasonably
+   mappable to observed data columns and parameters, given the JSON structure).
+
+Output STRICTLY this JSON:
+
+{{
+  "validity_score": 0.0,
+  "strengths": ["..."],
+  "weaknesses": ["..."],
+  "alignment_issues": ["..."],
+  "reasoning": "2-3 sentence summary."
+}}
+
+Rules:
+- validity_score MUST be between 0.0 and 1.0.
+- Use 3-6 bullet points for strengths, weaknesses, alignment_issues (each).
+- No extra keys and no extra text outside the JSON.
+"""
+
+response = client.chat.completions.create(
+        model="gpt-5.1",
+        messages=[{"role": "user", "content": prompt}],
+)
+        

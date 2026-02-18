@@ -1,0 +1,108 @@
+plotting_prompt = f"""
+You are an expert data analyst.
+
+You are given simulation time-series data from a single run.
+The data is provided as a Python dict mapping column names to lists of values, e.g.:
+
+data = {example_data}
+
+1) SIMULATION DESCRIPTION (context):
+{simulation_description}
+
+2) CONCEPTUAL MODEL for this simulation (objectives, entities, state variables, mechanisms, assumptions, expected behaviours):
+{json.dumps(conceptual_model, indent=2)}
+
+Your task is to write a SMALL HELPER MODULE that defines a single function:
+
+    def generate_plots(data, out_dir: str) -> None:
+
+CRITICAL GOAL:
+Create plots that are *most useful for understanding whether the run behaves plausibly*,
+based on the simulation description and conceptual model. Do NOT plot everything.
+
+Requirements for generate_plots:
+
+0) Output:
+   - Produce EXACTLY 3 figures.
+   - Save them as:
+       - "graph1.png"
+       - "graph2.png"
+       - "graph3.png"
+
+1) Inputs and inference:
+   - `data` is a dict mapping column names to lists of numeric values.
+   - Infer the time axis from keys like: 'step', 't', 'time', 'tick', 'ticks', 'iteration'.
+     If multiple exist, choose the most plausible time axis (monotonic increasing is preferred).
+   - From the remaining keys, select ONLY the most informative variables for the two plots.
+     Do not include irrelevant or redundant variables.
+
+2) Variable selection rules (generic, but strict):
+   - Exclude constant or nearly-constant series (very low variance) unless it is clearly meaningful.
+   - Prefer variables that:
+       (a) represent core system state (counts, totals, averages, distances, energies, errors),
+       (b) show clear dynamics (trends, convergence, oscillation, spikes),
+       (c) align with the conceptual model’s objectives and expected behaviors.
+   - Avoid plotting more than 4 unique variables total across both figures (not counting time).
+   - Do not choose variables solely because they exist; justify selection implicitly by the plot design.
+
+3) Plot design rules (strict):
+   - (Very Important) The plots must be visually and analytically distinct, using varied plot types and layouts to maximize information density.
+   - Do NOT put more than 3 lines on the same axes.
+   - If you need more than 2 variables in a figure, use multiple subplots within that figure
+     (stacked vertically), sharing the same x-axis.
+   - Use clear titles and axis labels that explain what each plot is showing.
+   - Use ONLY matplotlib (no seaborn).
+   - Do NOT call plt.show().
+   - Close each figure with plt.close() after saving.
+   - Create `out_dir` if it does not exist.
+   
+
+
+
+5) Robustness:
+   - Handle missing or irregular data gracefully.
+   - Convert lists to numpy arrays internally.
+   - If lengths do not match the time axis, truncate all series to the shortest length.
+   - Ensure the function always produces exactly 2 saved figures.
+
+   Outlier and scale handling (important):
+   - If a variable contains extreme early values or isolated spikes that dominate the y-axis
+     and visually obscure later dynamics, mitigate this in a transparent way.
+   - Prefer one of the following strategies (choose the simplest that preserves interpretability):
+       (a) Use a logarithmic y-scale if the values are strictly positive.
+       (b) Trim only the initial transient when it is clearly an initialization artifact,
+           and document this in the plot title (e.g., "after initial transient").
+       (c) Plot the same variable in two vertically stacked subplots:
+           – top: full range (including outliers),
+           – bottom: zoomed-in range excluding extreme values (e.g., clipping to percentile bounds).
+   - Do NOT silently drop data or hide outliers without explanation.
+   - Do NOT rescale data in a way that changes its qualitative meaning.
+
+
+6) You may assume the following imports already exist at module level:
+   - import os
+   - import numpy as np
+   - import matplotlib
+   - matplotlib.use("Agg", force=True)
+   - import matplotlib.pyplot as plt
+
+
+7) Do NOT execute anything at import time:
+   - matplotlib version is 3.9.2, code must be according to that
+   - No top-level plotting.
+   - No `if __name__ == '__main__':`
+   - Only define the function `generate_plots`.
+
+8) PERFORMANCE CONSTRAINTS (Very IMPORTANT):
+- The time series can be very long (up to 1,000,000 steps). 
+- Give the code accordingly.
+- if any downsampling is required then do it before all the process. The plotting should not get stuck because for longer computing times
+
+
+Return ONLY the Python code for this helper module, inside a ```python code block,
+with the imports and the function definition.
+"""
+response = client.chat.completions.create(
+    model="gpt-5.1",
+    messages=[{"role": "user", "content": plotting_prompt}],
+)

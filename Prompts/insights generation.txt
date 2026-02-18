@@ -1,0 +1,49 @@
+
+    messages = []
+
+    # high-level instruction + context, now including expectations + rule summary
+    messages.append({
+        "role": "user",
+        "content": (
+            f"These are plots from simulation run {run_idx + 1} "
+            f"({run_dir}). Use the simulation description and conceptual expectations as context.\n\n"
+            "CONCEPTUAL EXPECTATIONS (behaviour the model claims to have):\n"
+            f"{CONCEPTUAL_EXPECTATIONS_TEXT}\n\n"
+            "TASK: Provide 4 structured, technical insights about this single run.\n"
+            "- First, describe the main patterns you see (stability, oscillations, trends, anomalies).\n"
+            "- Second, explicitly discuss how this run SUPPORTS or VIOLATES the conceptual expectations,\n"            
+            "Return the insights as a numbered list of short paragraphs."
+        ),
+    })
+
+    messages.append({
+        "role": "user",
+        "content": "SIMULATION DESCRIPTION:\n" + simulation_description
+    })
+
+    # add each image
+    for path in image_paths:
+        messages.append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": (
+                        f"Run {run_idx + 1}, plot file: {os.path.basename(path)}. "
+                        "Analyze this in the context of this run and the conceptual expectations."
+                    ),
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": encode_image(path),
+                    },
+                },
+            ],
+        })
+
+    analysis_response = client.chat.completions.create(
+        model="gpt-5.1",
+        messages=messages,
+        max_completion_tokens=1200,
+    )
