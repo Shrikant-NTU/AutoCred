@@ -1,0 +1,70 @@
+simulation_description = f"""
+## Simulation description: NetLogo Wolf–Sheep Predation model
+
+This simulation models a classic **predator–prey ecosystem** in which two interacting agent populations—**wolves** (predators) and **sheep** (prey)—coexist and evolve over time within a spatial environment. Population-level dynamics emerge from simple local interaction rules governing movement, reproduction, energy consumption, and death.
+
+Each run outputs multivariate time-series data including:
+- **time / step** (t = 0, …, T−1)
+- **sheep population count**
+- **wolf population count**
+- **grass availability or regrowth state** (if enabled)
+- **energy-related aggregates** (if tracked)
+
+Agents move on a 2D grid and interact only with their local environment. Sheep consume grass to gain energy and reproduce, while wolves hunt sheep to survive and reproduce. Energy depletion leads to death, introducing natural population turnover.
+
+### Core dynamics
+- **Sheep dynamics:**  
+  Sheep gain energy by consuming grass (when enabled), lose energy through movement, and reproduce probabilistically when energy thresholds are met.
+- **Wolf dynamics:**  
+  Wolves lose energy through movement, gain energy by consuming sheep, and reproduce probabilistically when energy thresholds are met.
+- **Resource regeneration (optional):**  
+  Grass regrows after a fixed delay, coupling prey dynamics to environmental constraints.
+
+These interacting mechanisms generate nonlinear population trajectories without centralized control or equilibrium enforcement.
+
+### Primary credibility objective: ecological balance
+The **central credibility criterion** for this simulation is the **maintenance of ecological balance between predator and prey populations** over time. A credible simulation run should demonstrate sustained coexistence of wolves and sheep, reflecting mutual dependence through predation, reproduction, and energy constraints.
+
+Specifically:
+- If **either wolves or sheep go extinct** for a substantial portion of the simulation horizon, the resulting dynamics are considered **ecologically implausible**, and the simulation credibility should be assessed as **low (below 20%)**.
+- If **both populations persist** and exhibit a **balanced interaction pattern**—such as oscillatory dynamics, bounded fluctuations, or long-run coexistence without runaway growth or irreversible collapse—the simulation should be assessed as **highly credible (above 92%)**.
+
+This balance-focused criterion intentionally prioritizes **qualitative ecological consistency** over numerical precision or equilibrium convergence.
+
+### Expected behaviors
+A credible analysis should detect:
+- oscillatory or cyclic dynamics in predator and prey populations,
+- lagged responses between sheep growth and wolf population changes,
+- population crashes or recoveries depending on reproduction and energy parameters,
+- sensitivity of long-run dynamics to parameter settings (e.g., reproduction rates, energy gains).
+
+### Known limitation
+The model is **highly stylized** and omits many ecological factors present in real ecosystems, such as age structure, spatial heterogeneity beyond local interactions, adaptive behavior, and evolutionary change. Population regulation arises purely from fixed rules and energy constraints rather than adaptive optimization.
+
+### Framework goal
+The credibility framework should (i) identify the characteristic predator–prey interaction patterns from raw time-series data, (ii) assess robustness of these patterns across stochastic runs, and (iii) evaluate whether long-run coexistence or collapse outcomes are consistent with the stated interaction rules and resource constraints.
+
+### What will be judged for credibility assessment
+
+Credibility for this simulation is assessed by evaluating whether the observed time-series exhibit the **intended ecological interaction behaviors**, with particular emphasis on sustained predator–prey coexistence rather than convergence to a fixed equilibrium. Specifically, the framework will judge:
+
+1. **Predator–prey coupling**  
+   Whether changes in wolf and sheep populations exhibit coupled dynamics consistent with predation and reproduction mechanisms.
+
+2. **Ecological balance and persistence**  
+   Whether both predator and prey populations persist over time without irreversible extinction or unbounded growth.
+
+3. **Population oscillations or regime shifts**  
+   Whether population trajectories show cyclic behavior, collapse–recovery patterns, or stable coexistence depending on parameter settings.
+
+4. **Energy and resource consistency**  
+   Whether population changes are consistent with energy gain/loss rules and resource regeneration dynamics (when grass is enabled).
+
+5. **Stochastic robustness**  
+   Whether qualitative population-level patterns are consistently observed across multiple stochastic runs, despite variability in individual agent interactions.
+
+6. **Consistency with stated limitations**  
+   Whether the simplicity of agent rules is reflected in the dynamics, without incorrectly inferring adaptive, strategic, or evolutionary behavior not present in the model.
+
+Together, these criteria evaluate whether the simulation credibly reproduces the qualitative predator–prey dynamics implied by its local interaction rules and clearly communicates the scope and limitations of its ecological representation.
+"""

@@ -1,0 +1,44 @@
+simulation_description = f"""
+## Simulation description: Agent-based flocking model
+
+This simulation generates collective motion dynamics using an agent-based flocking model inspired by local interaction rules. Individual agents (boids) move in continuous space and adjust their heading based on neighboring agents within a fixed perception radius. The goal of the model is to reproduce coordinated flock formation through simple decentralized rules.
+
+Agents follow three core behavioral mechanisms:
+1. Alignment — steering toward the average heading of nearby agents.
+2. Cohesion — steering toward the local center of mass.
+3. Separation — avoiding collisions by maintaining minimum distance.
+
+Model parameters (e.g., vision radius, maximum turn angles, minimum separation distance) govern the relative strength of these mechanisms.
+
+### Expected behaviors
+A credible analysis should detect:
+- gradual emergence of global alignment from initially random headings,
+- formation of at least one dominant cohesive group,
+- bounded nearest-neighbor distances without persistent overlaps,
+- transient high turning activity during early reorganization followed by lower steady-state turning,
+- robustness of these qualitative patterns across multiple stochastic runs.
+
+### Framework goal
+The credibility framework should (i) detect emergence of collective alignment from local rules, (ii) assess spatial cohesion and separation stability over time, and (iii) evaluate consistency of flock formation across independent runs.
+
+### What will be judged for credibility assessment
+
+Credibility for this simulation is assessed by evaluating whether the multi-agent system exhibits the intended emergent collective behavior. Specifically, the framework will judge:
+
+1. Collective alignment formation  
+   Whether mean heading alignment increases over time and stabilizes at a high level, indicating successful convergence toward coordinated motion.
+
+2. Spatial cohesion and spacing  
+   Whether agents form compact but stable groups with bounded nearest-neighbor distances, avoiding both collapse and excessive dispersion.
+
+3. Collision and overlap control  
+   Whether minimum separation is maintained without persistent agent overlap.
+
+4. Turn-rate dynamics consistency  
+   Whether turning activity is elevated during initial reorganization and decreases once flock structure is established.
+
+5. Robustness across runs  
+   Whether the above qualitative behaviors are consistently observed across multiple stochastic runs.
+
+Together, these criteria evaluate whether the simulation credibly reproduces emergent flocking dynamics from its specified local interaction rules.
+"""

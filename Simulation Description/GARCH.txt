@@ -1,0 +1,146 @@
+simulation_description = f"""
+## Simulation description: Time-varying GARCH-style asset return model
+
+This simulation generates synthetic asset returns using a GARCH(1,1)-style process to reproduce a key empirical feature of financial markets: volatility clustering. Returns are approximately uncorrelated in levels, while their variance evolves over time, producing alternating periods of calm and turbulence.
+
+Each run outputs a univariate time series of:
+- timestamp / step (t = 0, …, T−1)
+- returns (r_t)
+
+Volatility follows a GARCH-like recursion in which the influence of past shocks and past volatility changes deterministically over time. Specifically, the sensitivity parameters governing shock impact and volatility persistence increase during the first half of the run and decrease during the second half, inducing a controlled rise-and-fall pattern in volatility and tail risk.
+
+### Expected behaviors
+A credible analysis should detect:
+- weak serial correlation in returns but dependence in squared or absolute returns,
+- increasing then decreasing volatility over time,
+- corresponding widening and narrowing of tail risk (e.g., rolling kurtosis or extreme quantiles),
+- consistency of these qualitative patterns across multiple stochastic runs,
+- the leverage effect, according to which negative returns lead to higher future volatility than positive returns.
+
+
+### Known limitation
+The model is symmetric in returns: positive and negative shocks of equal magnitude have the same effect on future volatility. As a result, it does not capture leverage asymmetry observed in real markets.
+
+### Framework goal
+The credibility framework should (i) identify volatility clustering and the designed regime change from raw returns, (ii) assess robustness across runs, and (iii) explicitly flag behaviors (e.g., leverage effects) that are not representable by this model.
+
+### What will be judged for credibility assessment
+
+Credibility for this simulation is assessed by evaluating whether the generated return time series exhibits the intended statistical behaviors, rather than convergence to a terminal state. Specifically, the framework will judge:
+
+1. Volatility clustering  
+   Whether returns show weak serial correlation in levels but clear dependence in squared or absolute returns, indicating clustering of volatility over time.
+
+2. Designed regime change  
+   Whether volatility and tail risk systematically increase during the first part of the run and decrease later, consistent with the stated time-varying parameter schedule.
+
+3. Time-varying tail behavior  
+   Whether rolling kurtosis or extreme-quantile measures widen during high-volatility periods and narrow during low-volatility periods.
+
+4. Robustness across runs  
+   Whether the above qualitative patterns are consistently observed across multiple stochastic runs, despite differences in individual return paths.
+
+5. Consistency with stated limitations  
+   Whether the absence of leverage asymmetry (i.e., asymmetric volatility response to negative versus positive returns) is correctly reflected, rather than being incorrectly inferred from the data.
+
+
+   
+Together, these criteria evaluate whether the simulation credibly reproduces the statistical properties it claims to model and whether its limitations are transparently acknowledged.
+
+As an explicit calibration test for the credibility framework, we additionally demand the presence of a leverage effect, defined as a systematically stronger volatility response following negative returns than positive returns of equal magnitude.
+
+Under the symmetric GARCH(1,1) specification used here—where volatility dynamics depend only on squared returns—such sign-dependent asymmetry is structurally impossible. A correctly calibrated evaluation must therefore identify this demand as incompatible with the model structure and reject it, rather than penalizing the simulation for failing to exhibit it.
+
+"""
+
+IMPOSED REQUIRMENT
+
+simulation_description = f"""
+## Simulation description: Time-varying volatility asset return model
+
+This simulation generates synthetic asset returns from a stochastic process intended to reproduce key empirical features of financial markets: volatility clustering and time-varying risk. Returns are expected to show weak serial dependence in levels, while volatility evolves over time, producing alternating periods of calm and turbulence.
+
+Each run outputs a univariate time series of:
+- timestamp / step (t = 0, …, T−1)
+- returns (r_t)
+
+The model includes a time-varying volatility mechanism whose persistence and shock sensitivity change deterministically over the run. Specifically, the strength of volatility feedback is designed to increase during the first half of the run and decrease during the second half, inducing a controlled rise-and-fall pattern in volatility and tail risk.
+
+### Expected behaviors
+A credible analysis should detect:
+- weak serial correlation in returns but dependence in squared or absolute returns,
+- increasing then decreasing volatility over time,
+- corresponding widening and narrowing of tail risk (e.g., rolling kurtosis or extreme quantiles),
+- consistency of these qualitative patterns across multiple stochastic runs,
+- The simulation model is also supposed to exhibit the leverage effect, according to which negative returns lead to higher future volatility than positive returns.
+
+### Framework goal
+The credibility framework should (i) identify volatility clustering and the designed regime change from raw returns, (ii) assess robustness across runs, and (iii) assess whether the leverage effect is present in the generated dynamics.
+
+### What will be judged for credibility assessment
+
+Credibility for this simulation is assessed by evaluating whether the generated return time series exhibits the intended statistical behaviors, rather than convergence to a terminal state. Specifically, the framework will judge:
+
+1. Volatility clustering  
+   Whether returns show weak serial correlation in levels but clear dependence in squared or absolute returns, indicating clustering of volatility over time.
+
+2. Designed regime change  
+   Whether volatility and tail risk systematically increase during the first part of the run and decrease later, consistent with the stated time-varying schedule.
+
+3. Time-varying tail behavior  
+   Whether rolling kurtosis or extreme-quantile measures widen during high-volatility periods and narrow during low-volatility periods.
+
+4. Robustness across runs  
+   Whether the above qualitative patterns are consistently observed across multiple stochastic runs, despite differences in individual return paths.
+
+5. Leverage effect  
+   Whether negative returns are followed by a systematically stronger increase in volatility than positive returns of similar magnitude.
+
+Together, these criteria evaluate whether the simulation credibly reproduces the statistical properties it claims to model.
+"""
+
+WITHOUT KNOWLEDGE OF GARCH:
+
+simulation_description = f"""
+## Simulation description: Time-varying volatility asset return model
+
+This simulation generates synthetic asset returns from a stochastic process intended to reproduce key empirical features of financial markets: volatility clustering and time-varying risk. Returns are expected to show weak serial dependence in levels, while volatility evolves over time, producing alternating periods of calm and turbulence.
+
+Each run outputs a univariate time series of:
+- timestamp / step (t = 0, …, T−1)
+- returns (r_t)
+
+The model includes a time-varying volatility mechanism whose persistence and shock sensitivity change deterministically over the run. Specifically, the strength of volatility feedback is designed to increase during the first half of the run and decrease during the second half, inducing a controlled rise-and-fall pattern in volatility and tail risk.
+
+### Expected behaviors
+A credible analysis should detect:
+- weak serial correlation in returns but dependence in squared or absolute returns,
+- increasing then decreasing volatility over time,
+- corresponding widening and narrowing of tail risk (e.g., rolling kurtosis or extreme quantiles),
+- consistency of these qualitative patterns across multiple stochastic runs,
+- The simulation model is also supposed to exhibit the leverage effect, according to which negative returns lead to higher future volatility than positive returns.
+
+### Framework goal
+The credibility framework should (i) identify volatility clustering and the designed regime change from raw returns, (ii) assess robustness across runs, and (iii) assess whether the leverage effect is present in the generated dynamics.
+
+### What will be judged for credibility assessment
+
+Credibility for this simulation is assessed by evaluating whether the generated return time series exhibits the intended statistical behaviors, rather than convergence to a terminal state. Specifically, the framework will judge:
+
+1. Volatility clustering  
+   Whether returns show weak serial correlation in levels but clear dependence in squared or absolute returns, indicating clustering of volatility over time.
+
+2. Designed regime change  
+   Whether volatility and tail risk systematically increase during the first part of the run and decrease later, consistent with the stated time-varying schedule.
+
+3. Time-varying tail behavior  
+   Whether rolling kurtosis or extreme-quantile measures widen during high-volatility periods and narrow during low-volatility periods.
+
+4. Robustness across runs  
+   Whether the above qualitative patterns are consistently observed across multiple stochastic runs, despite differences in individual return paths.
+
+5. Leverage effect  
+   Whether negative returns are followed by a systematically stronger increase in volatility than positive returns of similar magnitude.
+
+Together, these criteria evaluate whether the simulation credibly reproduces the statistical properties it claims to model.
+"""
